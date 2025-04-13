@@ -81,7 +81,7 @@ int main(int argc, char** argv) {
 
     if (argc != 3) {
         if (rank == 0)
-            cerr << "Usage: ./mpi_sort input.csv output.csv\n";
+            cerr << "Usage: mpirun -np 1 input.csv output.csv\n";
         MPI_Finalize();
         return 1;
     }
@@ -168,14 +168,20 @@ int main(int argc, char** argv) {
         }
     }
 
+    int line_count = 0;
+
     if (rank == 0) {
         ofstream fout(outputFile);
-        for (auto& p : sorted_data)
-            fout << serializeProduct(p) << "\n";
+        for (auto& p : sorted_data) {
+          fout << serializeProduct(p) << "\n";
+          line_count++;
+        }
+          
         fout.close();
 
         double end_time = MPI_Wtime();
-        cout << "Total sorting time: " << (end_time - start_time) * 1000 << " ms" << endl;
+        // time in milliseconds, number of lines
+        cout << (end_time - start_time) * 1000 << ", " << line_count;
     }
 
     MPI_Finalize();
