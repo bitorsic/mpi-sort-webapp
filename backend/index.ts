@@ -5,11 +5,13 @@ import fs from 'fs';
 import { exec } from 'child_process';
 import multer from 'multer';
 import readline from 'readline';
+import cors from 'cors';
 
 const app = express();
 const port = 3000;
 
 app.use(express.json());
+app.use(cors());
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
