@@ -1,54 +1,118 @@
-# React + TypeScript + Vite
+# MPI Product Sorting WebApp
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This is a full-stack web application for parallel sorting of product data using MPI. It accepts a CSV file with product information, uses a C++ MPI backend to sort based on prices, and displays the result in a paginated UI.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🧠 Tech Stack
 
-## Expanding the ESLint configuration
+- **Frontend**: Vite + React + TypeScript + ShadCN + TanStack Table
+- **Backend**: Node.js + Express + TypeScript + Multer + child\_process
+- **Sorting Engine**: C++ with MPI
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+---
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+## 📁 Project Structure
+
+```
+mpi-sort-webapp/
+├── backend/
+│   ├── index.ts             # Express server
+│   ├── mpi_sort             # C++ compiled binary
+│   ├── mpi_sort.cpp         # Source code for parallel sorting
+│   ├── tmp/                 # Stores uploaded and sorted CSV files (create this manually)
+├── frontend/                # Vite React frontend
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+---
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## 🚀 Setup
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
+### 1. Backend Setup
+
+- Install dependencies:
+  ```bash
+  cd backend
+  npm install
+  ```
+- Build MPI program:
+  ```bash
+  mpic++ -o mpi_sort mpi_sort.cpp
+  ```
+- Create the `tmp` folder to store CSVs:
+  ```bash
+  mkdir tmp
+  ```
+- Start the backend:
+  ```bash
+  npx tsx index.ts
+  ```
+
+### 2. Frontend Setup
+
+- Start the frontend:
+  ```bash
+  cd frontend
+  npm install
+  npm run dev
+  ```
+
+---
+
+## 📦 API Endpoints
+
+### POST `/`
+
+Used to upload a CSV and run the MPI sort.
+
+**Form Data:**
+
+- `csvFile`: The CSV file to sort
+- `threads`: Number of MPI threads to use
+
+**Returns:**
+
+```json
+{
+  "message": "File sorted successfully",
+  "downloadUrl": "/tmp/sorted-<timestamp>.csv"
+}
 ```
+
+---
+
+### GET `/`
+
+Returns paginated product data from the sorted CSV.
+
+**Query Params:**
+
+- `page` (number): Page index (0-based)
+- `size` (number): Page size
+
+**Returns:**
+
+```json
+{
+  "data": [ { name, price, brand, category }, ... ],
+  "total": 5374
+}
+```
+
+---
+
+## 📄 CSV Format
+
+No headers. 4 values per line:
+
+```
+name,price,brand,category
+```
+
+Example:
+
+```
+LogiTech Mouse,29.99,LogiTech,Accessories
+Acer Aspire 5,549.99,Acer,Laptops
+```
+
