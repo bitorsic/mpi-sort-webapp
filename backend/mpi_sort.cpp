@@ -4,12 +4,14 @@
 #include <vector>
 #include <sstream>
 #include <algorithm>
+#include <cmath>
+#include <iomanip>
 
 using namespace std;
 
 struct Product {
     string name;
-    int price;
+    float price;
     string brand;
     string category;
 };
@@ -22,11 +24,13 @@ Product parseLine(const string& line) {
     getline(ss, brand, ',');
     getline(ss, category, ',');
 
-    return Product{name, stoi(priceStr), brand, category};
+    return Product{name, round(stof(priceStr) * 100) / 100.0f, brand, category};
 }
 
 string serializeProduct(const Product& p) {
-    return p.name + "," + to_string(p.price) + "," + p.brand + "," + p.category;
+    ostringstream oss;
+    oss << fixed << setprecision(2) << p.price;
+    return p.name + "," + oss.str() + "," + p.brand + "," + p.category;
 }
 
 Product deserializeProduct(const string& line) {

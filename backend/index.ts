@@ -49,10 +49,10 @@ app.post('/', upload.single("csvFile"), (req, res) => {
 
 app.get('/', async (req, res) => {
   try {
-    const page = Number(req.query.page) || 1;
+    const page = Number(req.query.page) || 0;
     const size = Number(req.query.size) || 10;
 
-    const startLine = (page - 1) * size;
+    const startLine = page * size;
     const endLine = startLine + size;
 
     const stream = fs.createReadStream("output.csv");

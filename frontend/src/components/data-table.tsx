@@ -1,5 +1,6 @@
 import { ColumnDef, flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table";
+import { DataTablePagination } from "./pagination";
 
 export type Product = {
   name: string,
@@ -30,12 +31,36 @@ export const columns: ColumnDef<Product>[] = [
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
+  rowCount: number
+  pagination: {
+    pageIndex: number
+    pageSize: number
+  },
+  setPagination: React.Dispatch<React.SetStateAction<{
+    pageIndex: number
+    pageSize: number
+  }>>
 }
 
-export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData, TValue>) {
-  const table = useReactTable({ data, columns, getCoreRowModel: getCoreRowModel()});
+export function DataTable<TData, TValue>({
+  columns,
+  data,
+  rowCount,
+  pagination,
+  setPagination,
+}: DataTableProps<TData, TValue>) {
+  const table = useReactTable({
+    data,
+    columns,
+    getCoreRowModel: getCoreRowModel(),
+    manualPagination: true,
+    rowCount,
+    onPaginationChange: setPagination,
+    state: { pagination }
+  });
 
   return (
+    <>
     <div className="rounded-md border">
       <Table>
         <TableHeader>
@@ -80,5 +105,7 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData
         </TableBody>
       </Table>
     </div>
+    <DataTablePagination table={table} />
+    </>
   )
 };
