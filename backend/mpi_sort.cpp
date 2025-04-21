@@ -169,7 +169,7 @@ int main(int argc, char** argv) {
     }
   }
 
-  int line_count = 0;
+  unsigned long long int line_count = 0;
 
   if (rank == 0) {
     ofstream fout(outputFile);
